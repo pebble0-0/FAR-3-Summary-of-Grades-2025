@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAR 3 - Grade Summary Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --bg: #f5f7fa;
+            --text: #333;
+            --white: #ffffff;
+            --border: #ecf0f1;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            background-color: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            background-color: var(--primary);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 3.0rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: 1.5px;
+        }
+
+        .header h2 {
+            font-size: 1.2rem;
+            font-weight: 300;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 25px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid var(--border);
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .search-box {
+            display: flex;
+            gap: 12px;
+            position: relative;
+        }
+
+        .search-box input {
+            flex-grow: 1;
+            padding: 14px 18px;
+            font-size: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.15);
+        }
+
+        .search-btn {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-1px);
+        }
+
+        #errorMsg {
+            display: none;
+            background-color: #fdeaea;
+            color: var(--accent);
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            text-align: center;
+            border: 1px solid rgba(231, 76, 60, 0.2);
+        }
+
+        .grade-results {
+            display: none;
+            margin-top: 40px;
+            border: 1px solid #e1e8ed;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .student-info {
+            background-color: var(--primary);
+            color: white;
+            padding: 25px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .student-info h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .student-no-badge {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .grade-details-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background-color: #fff;
+        }
+
+        .term-details {
+            padding: 30px;
+            border-right: 1px solid #f0f0f0;
+        }
+
+        .term-details:last-child {
+            border-right: none;
+        }
+
+        .term-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .term-title i {
+            color: var(--secondary);
+        }
+
+        .grades-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .grades-table th {
+            text-align: left;
+            padding: 12px;
+            background-color: #f8fafc;
+            border-bottom: 2px solid #edf2f7;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+        }
+
+        .grades-table td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .component-name {
+            font-weight: 500;
+            color: #475569;
+        }
+
+        .component-score {
+            text-align: right;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .component-total {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+        .grade-summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 30px;
+            background-color: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .summary-card h4 {
+            font-size: 0.9rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 8px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 1rem;
+        }
+
+        .summary-row .label { font-weight: 500; color: #475569; }
+        .summary-row .value { font-weight: 700; color: var(--primary); }
+        .summary-row.total { 
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 2px dashed #e2e8f0;
+            color: var(--secondary);
+        }
+
+        .disclaimer {
+            background-color: #fff9f9;
+            border-left: 4px solid var(--accent);
+            padding: 20px;
+            margin-top: 40px;
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.6;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .footer {
+            background-color: #f1f5f9;
+            padding: 25px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #94a3b8;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .back-btn {
+            background-color: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin: 20px auto;
+        }
+
+        @media (max-width: 850px) {
+            .grade-details-container, .grade-summary-grid { grid-template-columns: 1fr; }
+            .term-details { border-right: none; border-bottom: 1px solid #f0f0f0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>FAR 3</h1>
+            <h2>Intermediate Accounting 3</h2>
+        </div>
+        
+        <div class="content">
+            <h2 class="section-title">Summary of Grades</h2>
+            
+            <div class="form-group">
+                <label for="studentNo">Student Number</label>
+                <div class="search-box">
+                    <input type="text" id="studentNo" placeholder="e.g. 2018100082" autocomplete="off">
+                    <button class="search-btn" id="searchBtn">
+                        <i class="fas fa-search"></i> SEARCH
+                    </button>
+                </div>
+                <div id="errorMsg">
+                    <i class="fas fa-exclamation-circle"></i> 
+                    <span>Student number not found. Please try again.</span>
+                </div>
+            </div>
+            
+            <!-- Results Section -->
+            <div class="grade-results" id="gradeResults">
+                <div class="student-info">
+                    <h3 id="studentName">Student Name</h3>
+                    <div class="student-no-badge">
+                        ID: <span id="studentNumber">0000000000</span>
+                    </div>
+                </div>
+                
+                <div class="grade-details-container">
+                    <div class="term-details">
+                        <h3 class="term-title"><i class="fas fa-calendar-check"></i> Midterm Details</h3>
+                        <table class="grades-table">
+                            <thead>
+                                <tr>
+                                    <th>Component</th>
+                                    <th style="text-align: right">Score</th>
+                                </tr>
+                            </thead>
+                            <tbody id="midtermBody"></tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="term-details">
+                        <h3 class="term-title"><i class="fas fa-flag-checkered"></i> Final Term Details</h3>
+                        <table class="grades-table">
+                            <thead>
+                                <tr>
+                                    <th>Component</th>
+                                    <th style="text-align: right">Score</th>
+                                </tr>
+                            </thead>
+                            <tbody id="finalBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="grade-summary-grid">
+                    <div class="summary-card">
+                        <h4>Raw Grade</h4>
+                        <div class="summary-row">
+                            <span class="label">Midterm Raw</span>
+                            <span class="value" id="rawMidterm">0.0000</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="label">Final Term Raw</span>
+                            <span class="value" id="rawFinal">0.0000</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span class="label">Average (MT & FT)</span>
+                            <span class="value" id="rawAverage">0.0000</span>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <h4>Encoded Grade</h4>
+                        <div class="summary-row">
+                            <span class="label">Midterm Grade</span>
+                            <span class="value" id="encodedMidterm">0.00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="label">Final Term Grade</span>
+                            <span class="value" id="encodedFinal">0.00</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; padding-bottom: 30px;">
+                    <button class="back-btn" id="backBtn">
+                        <i class="fas fa-arrow-left"></i> Back to Search
+                    </button>
+                </div>
+            </div>
+            
+            <div class="disclaimer">
+                <strong>Disclaimer:</strong> This portal is a reference for students of <strong>Mr. Joshua Poquiz</strong>. These records are unofficial. For official university grades, please access the official student information system.
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>FAR 3 Grade Portal &copy; 2025 | For academic purposes only</p>
+        </div>
+    </div>
+
+    <script>
+        // Complete student data mapping
+        const studentData = {
+            "2024101315": { name: "ACABO, Hisbon Jeric Neri", midterm: { "S2": "4/10", "R1": "10/10", "Q1": "14/40", "Q2": "18/48", "TERM EXAM": "21/60" }, final: { "S1": "18/18", "Q1": "16/40", "Q2": "15/50", "TERM EXAM": "26/60" }, rawGrade: { midterm: "3.3700", final: "3.0600", average: "3.2150" }, encodedGrade: { midterm: "5.00", final: "5.00" } },
+            "2024100990": { name: "ARCILLA, Achim Hezron Santotome", midterm: { "S2": "7/10", "R1": "10/10", "Q1": "25/40", "Q2": "25/48", "TERM EXAM": "35/60" }, final: { "S1": "15/18", "Q1": "23/40", "Q2": "33/50", "TERM EXAM": "34/60" }, rawGrade: { midterm: "2.5557", final: "2.4920", average: "2.5239" }, encodedGrade: { midterm: "2.50", final: "2.50" } },
+            "2024100904": { name: "BERNABE, Kristel Madeline Pagarigan", midterm: { "S2": "8/10", "R1": "10/10", "Q1": "18/40", "Q2": "28/48", "TERM EXAM": "30/60" }, final: { "S1": "18/18", "Q1": "23/40", "Q2": "35/50", "TERM EXAM": "36/60" }, rawGrade: { midterm: "2.7333", final: "2.3000", average: "2.5167" }, encodedGrade: { midterm: "2.75", final: "2.50" } },
+            "2024101615": { name: "BERNARDO, Jaina Julia Reign Bonus", midterm: { "S2": "5/10", "R1": "10/10", "Q1": "10/40", "Q2": "15/48", "TERM EXAM": "23/60" }, final: { "S1": "0/18", "Q1": "14/40", "Q2": "16/50", "TERM EXAM": "23/60" }, rawGrade: { midterm: "3.4142", final: "3.7740", average: "3.5941" }, encodedGrade: { midterm: "5.00", final: "5.00" } },
+            "2024100084": { name: "CAPILI, Thea Jayne Enriquez", midterm: { "S2": "8/10", "R1": "10/10", "Q1": "22/40", "Q2": "25/48", "TERM EXAM": "34/60" }, final: { "S1": "18/18", "Q1": "25/40", "Q2": "29/50", "TERM EXAM": "33/60" }, rawGrade: { midterm: "2.5833", final: "2.4460", average: "2.5147" }, encodedGrade: { midterm: "2.50", final: "2.50" } },
+            "2024100992": { name: "CAYABYAB, John Lester", midterm: { "S2": "9/10", "R1": "8/10", "Q1": "10/40", "Q2": "26/48", "TERM EXAM": "26/60" }, final: { "S1": "17/18", "Q1": "25/40", "Q2": "23/50", "TERM EXAM": "39/60" }, rawGrade: { midterm: "3.0842", final: "2.3953", average: "2.7398" }, encodedGrade: { midterm: "3.00", final: "2.75" } },
+            "2024100975": { name: "CORPUZ, Astrid Lorrine Castillo", midterm: { "S2": "6/10", "R1": "9/10", "Q1": "20/40", "Q2": "35/48", "TERM EXAM": "35/60" }, final: { "S1": "17/18", "Q1": "20/40", "Q2": "27/50", "TERM EXAM": "37/60" }, rawGrade: { midterm: "2.5641", final: "2.4913", average: "2.5277" }, encodedGrade: { midterm: "2.50", final: "2.50" } },
+            "2024100130": { name: "CORTES, Gene Gabriel Parcasio", midterm: { "S2": "6/10", "R1": "10/10", "Q1": "23/40", "Q2": "27/48", "TERM EXAM": "32/60" }, final: { "S1": "15/18", "Q1": "28/40", "Q2": "33/50", "TERM EXAM": "36/60" }, rawGrade: { midterm: "2.6878", final: "2.3320", average: "2.5099" }, encodedGrade: { midterm: "2.75", final: "2.50" } },
+            "2024100550": { name: "CRISTOBAL, Princess Mia Candelaria", midterm: { "S2": "6/10", "R1": "10/10", "Q1": "11/40", "Q2": "17/48", "TERM EXAM": "25/60" }, final: { "S1": "16/18", "Q1": "19/40", "Q2": "27/50", "TERM EXAM": "25/60" }, rawGrade: { midterm: "3.2724", final: "2.9047", average: "3.0885" }, encodedGrade: { midterm: "5.00", final: "3.00" } },
+            "2024101118": { name: "CRUZ, Cybel Allen Novenario", midterm: { "S2": "7/10", "R1": "10/10", "Q1": "23/40", "Q2": "33/48", "TERM EXAM": "31/60" }, final: { "S1": "15/18", "Q1": "22/40", "Q2": "30/50", "TERM EXAM": "43/60" }, rawGrade: { midterm: "2.5500", final: "2.2900", average: "2.4200" }, encodedGrade: { midterm: "2.50", final: "2.50" } },
+            "2024100789": { name: "DE DIOS, Tristan John Antonio", midterm: { "S2": "7/10", "R1": "8/10", "Q1": "25/40", "Q2": "30/48", "TERM EXAM": "34/60" }, final: { "S1": "12/18", "Q1": "29/40", "Q2": "38/50", "TERM EXAM": "43/60" }, rawGrade: { midterm: "2.5612", final: "2.1220", average: "2.3416" }, encodedGrade: { midterm: "2.50", final: "2.25" } },
+            "2024100005": { name: "DELA CRUZ, Frances Cancio", midterm: { "S2": "5/10", "R1": "10/10", "Q1": "19/40", "Q2": "26/48", "TERM EXAM": "39/60" }, final: { "S1": "18/18", "Q1": "20/40", "Q2": "34/50", "TERM EXAM": "41/60" }, rawGrade: { midterm: "2.5934", final: "2.2260", average: "2.4097" }, encodedGrade: { midterm: "2.50", final: "2.50" } },
+            "2023100308": { name: "DIMARUCOT, Edison Roy", midterm: { "S2": "10/10", "R1": "10/10", "Q1": "30/40", "Q2": "41/48", "TERM EXAM": "50/60" }, final: { "S1": "16/18", "Q1": "29/40", "Q2": "38/50", "TERM EXAM": "38/60" }, rawGrade: { midterm: "1.6857", final: "2.1387", average: "1.9122" }, encodedGrade: { midterm: "1.75", final: "2.00" } },
+            "2024100575": { name: "DIZON, Lyka Manuel", midterm: { "S2": "7/10", "R1": "10/10", "Q1": "17/40", "Q2": "40/48", "TERM EXAM": "39/60" }, final: { "S1": "12/18", "Q1": "28/40", "Q2": "31/50", "TERM EXAM": "46/60" }, rawGrade: { midterm: "2.3133", final: "2.1640", average: "2.2387" }, encodedGrade: { midterm: "2.25", final: "2.25" } },
+            "2024100889": { name: "ESCAREZ, Esferr Andal", midterm: { "S2": "9/10", "R1": "10/10", "Q1": "25/40", "Q2": "27/48", "TERM EXAM": "30/60" }, final: { "S1": "12/18", "Q1": "24/40", "Q2": "20/50", "TERM EXAM": "33/60" }, rawGrade: { midterm: "2.5800", final: "2.8100", average: "2.6950" }, encodedGrade: { midterm: "2.50", final: "2.75" } },
+            "2023104359": { name: "EUGENIO, John Michael Melecotones", midterm: { "S2": "3/10", "R1": "10/10", "Q1": "18/40", "Q2": "11/48", "TERM EXAM": "16/60" }, final: { "S1": "15/18", "Q1": "11/40", "Q2": "16/50", "TERM EXAM": "32/60" }, rawGrade: { midterm: "3.5910", final: "3.0640", average: "3.3275" }, encodedGrade: { midterm: "5.00", final: "5.00" } },
+            "2024100223": { name: "GOMEZ, Trixie Joy Cordero", midterm: { "S2": "6/10", "R1": "10/10", "Q1": "21/40", "Q2": "29/48", "TERM EXAM": "40/60" }, final: { "S1": "17/18", "Q1": "20/40", "Q2": "31/50", "TERM EXAM": "34/60" }, rawGrade: { midterm: "2.4425", final: "2.5173", average: "2.4799" }, encodedGrade: { midterm: "2.50", final: "2.50" } },
+            "2024100565": { name: "GONZALES, Kristine Nicole Canlas", midterm: { "S2": "8/10", "R1": "10/10", "Q1": "22/40", "Q2": "28/48", "TERM EXAM": "33/60" }, final: { "S1": "18/18", "Q1": "22/40", "Q2": "34/50", "TERM EXAM": "38/60" }, rawGrade: { midterm: "2.5633", final: "2.2760", average: "2.4197" }, encodedGrade: { midterm: "2.50", final: "2.50" } },
+            "2022300995": { name: "GUALDAD, Ma. Cristina Cabalu", midterm: { "S2": "4/10", "R1": "8/10", "Q1": "15/40", "Q2": "15/48", "TERM EXAM": "30/60" }, final: { "S1": "14/18", "Q1": "16/40", "Q2": "19/50", "TERM EXAM": "30/60" }, rawGrade: { midterm: "3.1900", final: "3.0093", average: "3.0997" }, encodedGrade: { midterm: "5.00", final: "3.00" } },
+            "2024100170": { name: "GUEVARRA, Ivan Paul Manalo", midterm: { "S2": "10/10", "R1": "10/10", "Q1": "27/40", "Q2": "32/48", "TERM EXAM": "38/60" }, final: { "S1": "15/18", "Q1": "21/40", "Q2": "23/50", "TERM EXAM": "30/60" }, rawGrade: { midterm: "2.2143", final: "2.8120", average: "2.5131" }, encodedGrade: { midterm: "2.25", final: "2.50" } },
+            "2024101715": { name: "GUTIERREZ, Vinz Harry Narciso", midterm: { "S2": "8/10", "R1": "10/10", "Q1": "4/40", "Q2": "9/48", "TERM EXAM": "23/60" }, final: { "S1": "16/18", "Q1": "13/40", "Q2": "14/50", "TERM EXAM": "20/60" }, rawGrade: { midterm: "3.5400", final: "3.3827", average: "3.4613" }, encodedGrade: { midterm: "5.00", final: "5.00" } },
+            "2024100436": { name: "ILDEFONSO, Hyacinth Jade Santos", midterm: { "S2": "10/10", "R1": "10/10", "Q1": "19/40", "Q2": "23/48", "TERM EXAM": "30/60" }, final: { "S1": "18/18", "Q1": "23/40", "Q2": "35/50", "TERM EXAM": "38/60" }, rawGrade: { midterm: "2.7367", final: "2.2400", average: "2.4883" }, encodedGrade: { midterm: "2.75", final: "2.50" } },
+            "2023100357": { name: "LACUESTA, Fhrex Elijah Esteban", midterm: { "S2": "9/10", "R1": "10/10", "Q1": "11/40", "Q2": "17/48", "TERM EXAM": "28/60" }, final: { "S1": "16/18", "Q1": "16/40", "Q2": "25/50", "TERM EXAM": "24/60" }, rawGrade: { midterm: "3.0867", final: "3.0267", average: "3.0567" }, encodedGrade: { midterm: "3.00", final: "3.00" } },
+            "2024100571": { name: "MACALONG, Exequiel Gracia", midterm: { "S2": "7/10", "R1": "10/10", "Q1": "16/40", "Q2": "17/48", "TERM EXAM": "21/60" }, final: { "S1": "16/18", "Q1": "20/40", "Q2": "26/50", "TERM EXAM": "31/60" }, rawGrade: { midterm: "3.2825", final: "2.7207", average: "3.0016" }, encodedGrade: { midterm: "5.00", final: "3.00" } },
+            "2024100226": { name: "MAGTOTO, Irish Flores", midterm: { "S2": "10/10", "R1": "9/10", "Q1": "21/40", "Q2": "25/48", "TERM EXAM": "33/60" }, final: { "S1": "18/18", "Q1": "20/40", "Q2": "27/50", "TERM EXAM": "29/60" }, rawGrade: { midterm: "2.6504", final: "2.6980", average: "2.6742" }, encodedGrade: { midterm: "2.75", final: "2.75" } },
+            "2024100674": { name: "MALIWAT, Erren Keith Asio", midterm: { "S2": "7/10", "R1": "9/10", "Q1": "21/40", "Q2": "24/48", "TERM EXAM": "29/60" }, final: { "S1": "16/18", "Q1": "20/40", "Q2": "31/50", "TERM EXAM": "37/60" }, rawGrade: { midterm: "2.8882", final: "2.4607", average: "2.6744" }, encodedGrade: { midterm: "3.00", final: "2.75" } },
+            "2023104374": { name: "MAMINTAL, Princess Samarah H.salic", midterm: { "S2": "5/10", "R1": "10/10", "Q1": "7/40", "Q2": "14/48", "TERM EXAM": "22/60" }, final: { "S1": "13/18", "Q1": "11/40", "Q2": "15/50", "TERM EXAM": "23/60" }, rawGrade: { midterm: "3.5167", final: "3.4167", average: "3.4667" }, encodedGrade: { midterm: "5.00", final: "5.00" } },
+            "2024101078": { name: "MANGUERA, Shamel Jamaeka Venterez", midterm: { "S2": "5/10", "R1": "10/10", "Q1": "25/40", "Q2": "29/48", "TERM EXAM": "40/60" }, final: { "S1": "17/18", "Q1": "23/40", "Q2": "35/50", "TERM EXAM": "41/60" }, rawGrade: { midterm: "2.3925", final: "2.1833", average: "2.2879" }, encodedGrade: { midterm: "2.50", final: "2.25" } },
+            "2024101322": { name: "MARCOS, Cyrene Cadangan", midterm: { "S2": "6/10", "R1": "10/10", "Q1": "28/40", "Q2": "40/48", "TERM EXAM": "46/60" }, final: { "S1": "18/18", "Q1": "26/40", "Q2": "38/50", "TERM EXAM": "43/60" }, rawGrade: { midterm: "1.9577", final: "1.9820", average: "1.9699" }, encodedGrade: { midterm: "2.00", final: "2.00" } },
+            "2024100614": { name: "MATA, Clarisse Miranda", midterm: { "S2": "7/10", "R1": "10/10", "Q1": "26/40", "Q2": "28/48", "TERM EXAM": "36/60" }, final: { "S1": "17/18", "Q1": "22/40", "Q2": "31/50", "TERM EXAM": "39/60" }, rawGrade: { midterm: "2.4527", final: "2.3273", average: "2.3900" }, encodedGrade: { midterm: "2.50", final: "2.50" } },
+            "2024101216": { name: "PANLILIO, Janelle Catubay", midterm: { "S2": "8/10", "R1": "9/10", "Q1": "10/40", "Q2": "14/48", "TERM EXAM": "14/60" }, final: { "S1": "17/18", "Q1": "19/40", "Q2": "12/50", "TERM EXAM": "24/60" }, rawGrade: { midterm: "3.6517", final: "3.1413", average: "3.3965" }, encodedGrade: { midterm: "5.00", final: "5.00" } },
+            "2024100399": { name: "PEROTE, Markuz Nathaniel Surla", midterm: { "S2": "7/10", "R1": "8/10", "Q1": "14/40", "Q2": "20/48", "TERM EXAM": "27/60" }, final: { "S1": "17/18", "Q1": "17/40", "Q2": "19/50", "TERM EXAM": "26/60" }, rawGrade: { midterm: "3.1417", final: "3.0093", average: "3.0755" }, encodedGrade: { midterm: "5.00", final: "3.00" } },
+            "2024100232": { name: "RAMOS, Ejay Dimarucot", midterm: { "S2": "10/10", "R1": "10/10", "Q1": "18/40", "Q2": "22/48", "TERM EXAM": "30/60" }, final: { "S1": "18/18", "Q1": "23/40", "Q2": "31/50", "TERM EXAM": "34/60" }, rawGrade: { midterm: "2.7772", final: "2.4240", average: "2.6006" }, encodedGrade: { midterm: "2.75", final: "2.50" } },
+            "2022103543": { name: "ROMBAOA, Kate Dianne Galleon", midterm: { "S2": "5/10", "R1": "9/10", "Q1": "6/40", "Q2": "11/48", "TERM EXAM": "23/60" }, final: { "S1": "12/18", "Q1": "9/40", "Q2": "14/50", "TERM EXAM": "19/60" }, rawGrade: { midterm: "3.6017", final: "3.6260", average: "3.6138" }, encodedGrade: { midterm: "5.00", final: "5.00" } },
+            "2024100093": { name: "SABADO, Allysa Rain", midterm: { "S2": "4/10", "R1": "10/10", "Q1": "21/40", "Q2": "32/48", "TERM EXAM": "42/60" }, final: { "S1": "17/18", "Q1": "26/40", "Q2": "27/50", "TERM EXAM": "38/60" }, rawGrade: { midterm: "2.3795", final: "2.3413", average: "2.3604" }, encodedGrade: { midterm: "2.50", final: "2.25" } },
+            "2024100105": { name: "SALAZAR, Nicole Miranda", midterm: { "S2": "6/10", "R1": "10/10", "Q1": "15/40", "Q2": "31/48", "TERM EXAM": "28/60" }, final: { "S1": "17/18", "Q1": "22/40", "Q2": "28/50", "TERM EXAM": "37/60" }, rawGrade: { midterm: "2.8690", final: "2.4353", average: "2.6522" }, encodedGrade: { midterm: "2.75", final: "2.75" } },
+            "2024101116": { name: "SANGALANG, Francis Emir De Leon", midterm: { "S2": "6/10", "R1": "10/10", "Q1": "14/40", "Q2": "18/48", "TERM EXAM": "26/60" }, final: { "S1": "18/18", "Q1": "10/40", "Q2": "24/50", "TERM EXAM": "34/60" }, rawGrade: { midterm: "3.1600", final: "2.7960", average: "2.9780" }, encodedGrade: { midterm: "5.00", final: "3.00" } },
+            "2024100393": { name: "SANTOS, Jaslyn Ann Galimba", midterm: { "S2": "7/10", "R1": "9/10", "Q1": "13/40", "Q2": "18/48", "TERM EXAM": "30/60" }, final: { "S1": "14/18", "Q1": "15/40", "Q2": "23/50", "TERM EXAM": "30/60" }, rawGrade: { midterm: "3.0789", final: "2.9653", average: "3.0221" }, encodedGrade: { midterm: "3.00", final: "3.00" } },
+            "2024800195": { name: "SANTOS, Keilah Kriselle Tarli", midterm: { "S2": "9/10", "R1": "8/10", "Q1": "20/40", "Q2": "41/48", "TERM EXAM": "46/60" }, final: { "S1": "17/18", "Q1": "24/40", "Q2": "37/50", "TERM EXAM": "45/60" }, rawGrade: { midterm: "2.0711", final: "2.0113", average: "2.0412" }, encodedGrade: { midterm: "2.00", final: "2.00" } },
+            "2024100326": { name: "SANTOS, Raiza Gomez", midterm: { "S2": "6/10", "R1": "10/10", "Q1": "18/40", "Q2": "32/48", "TERM EXAM": "37/60" }, final: { "S1": "17/18", "Q1": "24/40", "Q2": "34/50", "TERM EXAM": "44/60" }, rawGrade: { midterm: "2.5452", final: "2.0893", average: "2.3173" }, encodedGrade: { midterm: "2.50", final: "2.25" } },
+            "2024100770": { name: "SERRANO, Heaven Leah Marcelina Romero", midterm: { "S2": "8/10", "R1": "10/10", "Q1": "21/40", "Q2": "25/48", "TERM EXAM": "36/60" }, final: { "S1": "17/18", "Q1": "24/40", "Q2": "27/50", "TERM EXAM": "33/60" }, rawGrade: { midterm: "2.5739", final: "2.5313", average: "2.5526" }, encodedGrade: { midterm: "2.50", final: "2.50" } },
+            "2024100019": { name: "SIAOTONG, Arisha Jean Ibarra", midterm: { "S2": "8/10", "R1": "10/10", "Q1": "24/40", "Q2": "28/48", "TERM EXAM": "34/60" }, final: { "S1": "17/18", "Q1": "22/40", "Q2": "29/50", "TERM EXAM": "40/60" }, rawGrade: { midterm: "2.5245", final: "2.3293", average: "2.4269" }, encodedGrade: { midterm: "2.50", final: "2.50" } },
+            "2024101229": { name: "TEODORO, Janine Ferrer", midterm: { "S2": "10/10", "R1": "10/10", "Q1": "24/40", "Q2": "29/48", "TERM EXAM": "29/60" }, final: { "S1": "18/18", "Q1": "18/40", "Q2": "32/50", "TERM EXAM": "45/60" }, rawGrade: { midterm: "2.5715", final: "2.1780", average: "2.3747" }, encodedGrade: { midterm: "2.50", final: "2.25" } },
+            "2024100871": { name: "TIAMZON, Seiichi Kenn", midterm: { "S2": "10/10", "R1": "10/10", "Q1": "29/40", "Q2": "41/48", "TERM EXAM": "45/60" }, final: { "S1": "18/18", "Q1": "28/40", "Q2": "40/50", "TERM EXAM": "44/60" }, rawGrade: { midterm: "1.8080", final: "1.8800", average: "1.8440" }, encodedGrade: { midterm: "1.75", final: "1.75" } },
+            "2024100234": { name: "TIMBOL, Angel Aloro", midterm: { "S2": "10/10", "R1": "10/10", "Q1": "28/40", "Q2": "43/48", "TERM EXAM": "45/60" }, final: { "S1": "18/18", "Q1": "28/40", "Q2": "41/50", "TERM EXAM": "40/60" }, rawGrade: { midterm: "1.7946", final: "1.9840", average: "1.8893" }, encodedGrade: { midterm: "1.75", final: "2.00" } },
+            "2024100856": { name: "TINARIPE, Rhea Mae Supan", midterm: { "S2": "10/10", "R1": "10/10", "Q1": "27/40", "Q2": "42/48", "TERM EXAM": "43/60" }, final: { "S1": "18/18", "Q1": "21/40", "Q2": "33/50", "TERM EXAM": "46/60" }, rawGrade: { midterm: "1.8931", final: "2.0720", average: "1.9826" }, encodedGrade: { midterm: "2.00", final: "2.00" } },
+            "2024101736": { name: "TOLENTINO, Roland Christian Manalang", midterm: { "S2": "8/10", "R1": "10/10", "Q1": "20/40", "Q2": "18/48", "TERM EXAM": "33/60" }, final: { "S1": "16/18", "Q1": "20/40", "Q2": "31/50", "TERM EXAM": "24/60" }, rawGrade: { midterm: "2.7700", final: "2.8507", average: "2.8103" }, encodedGrade: { midterm: "2.75", final: "2.75" } },
+            "2024100146": { name: "TORIO, Princess Hernando", midterm: { "S2": "8/10", "R1": "8/10", "Q1": "19/40", "Q2": "16/48", "TERM EXAM": "28/60" }, final: { "S1": "15/18", "Q1": "20/40", "Q2": "19/50", "TERM EXAM": "25/60" }, rawGrade: { midterm: "3.0540", final: "3.0460", average: "3.0500" }, encodedGrade: { midterm: "3.00", final: "3.00" } },
+            "2024101719": { name: "TORRES, Job Alexander Cabading", midterm: { "S2": "10/10", "R1": "10/10", "Q1": "26/40", "Q2": "39/48", "TERM EXAM": "30/60" }, final: { "S1": "17/18", "Q1": "23/40", "Q2": "32/50", "TERM EXAM": "45/60" }, rawGrade: { midterm: "2.3339", final: "2.1113", average: "2.2226" }, encodedGrade: { midterm: "2.25", final: "2.25" } },
+            "2024100397": { name: "VARGAS, Denmark Bunacruz", midterm: { "S2": "7/10", "R1": "10/10", "Q1": "20/40", "Q2": "16/48", "TERM EXAM": "35/60" }, final: { "S1": "16/18", "Q1": "23/40", "Q2": "24/50", "TERM EXAM": "30/60" }, rawGrade: { midterm: "2.7733", final: "2.7227", average: "2.7480" }, encodedGrade: { midterm: "2.75", final: "2.75" } },
+            "2024100231": { name: "YALUNG, Blessed Zhyrelle Gania", midterm: { "S2": "4/10", "R1": "10/10", "Q1": "21/40", "Q2": "23/48", "TERM EXAM": "26/60" }, final: { "S1": "17/18", "Q1": "23/40", "Q2": "32/50", "TERM EXAM": "39/60" }, rawGrade: { midterm: "2.9967", final: "2.2913", average: "2.6440" }, encodedGrade: { midterm: "3.00", final: "2.75" } },
+            "2024100479": { name: "YUMUL, Harnielyn Bugarin", midterm: { "S2": "6/10", "R1": "10/10", "Q1": "6/40", "Q2": "15/48", "TERM EXAM": "25/60" }, final: { "S1": "16/18", "Q1": "15/40", "Q2": "17/50", "TERM EXAM": "25/60" }, rawGrade: { midterm: "3.4084", final: "3.1447", average: "3.2765" }, encodedGrade: { midterm: "5.00", final: "5.00" } },
+            "2024100277": { name: "AGUSTIN, Allen Steven Manalo", midterm: { "S2": "2/10", "R1": "8/10", "Q1": "19/40", "Q2": "23/48", "TERM EXAM": "36/60" }, final: { "S1": "16/18", "Q1": "22/40", "Q2": "34/50", "TERM EXAM": "31/60" }, rawGrade: { midterm: "2.8861", final: "2.5527", average: "2.7194" }, encodedGrade: { midterm: "3.00", final: "2.75" } },
+            "2023100701": { name: "ANTONIO, Glory Joy Ocampo", midterm: { "S2": "1/10", "R1": "10/10", "Q1": "10/40", "Q2": "9/48", "TERM EXAM": "22/60" }, final: { "S1": "17/18", "Q1": "18/40", "Q2": "15/50", "TERM EXAM": "17/60" }, rawGrade: { midterm: "3.6471", final: "3.3233", average: "3.4852" }, encodedGrade: { midterm: "5.00", final: "5.00" } },
+            "2024101511": { name: "ARAYATA, Johannah Zyrelle Baniqued", midterm: { "S2": "5/10", "R1": "10/10", "Q1": "11/40", "Q2": "22/48", "TERM EXAM": "27/60" }, final: { "S1": "15/18", "Q1": "24/40", "Q2": "24/50", "TERM EXAM": "24/60" }, rawGrade: { midterm: "3.1533", final: "2.9160", average: "3.0347" }, encodedGrade: { midterm: "5.00", final: "3.00" } },
+            "2024101425": { name: "BALAGTAS, Jairaness Alpindo", midterm: { "S2": "9/10", "R1": "10/10", "Q1": "13/40", "Q2": "15/48", "TERM EXAM": "27/60" }, final: { "S1": "16/18", "Q1": "22/40", "Q2": "20/50", "TERM EXAM": "29/60" }, rawGrade: { midterm: "3.1166", final: "2.8367", average: "2.9766" }, encodedGrade: { midterm: "3.00", final: "3.00" } },
+            "2024100503": { name: "BALTAR, Milky Grace Rigor", midterm: { "S2": "5/10", "R1": "10/10", "Q1": "23/40", "Q2": "24/48", "TERM EXAM": "37/60" }, final: { "S1": "18/18", "Q1": "26/40", "Q2": "30/50", "TERM EXAM": "37/60" }, rawGrade: { midterm: "2.5800", final: "2.2900", average: "2.4350" }, encodedGrade: { midterm: "2.50", final: "2.50" } },
+            "2024101316": { name: "BANAG, Irish Anne Bernabe", midterm: { "S2": "7/10", "R1": "10/10", "Q1": "11/40", "Q2": "13/48", "TERM EXAM": "28/60" }, final: { "S1": "18/18", "Q1": "20/40", "Q2": "32/50", "TERM EXAM": "34/60" }, rawGrade: { midterm: "3.2133", final: "2.4680", average: "2.8407" }, encodedGrade: { midterm: "5.00", final: "2.75" } },
+            "2023101844": { name: "BARELA, Justine Caplis", midterm: { "S2": "5/10", "R1": "9/10", "Q1": "22/40", "Q2": "27/48", "TERM EXAM": "39/60" }, final: { "S1": "16/18", "Q1": "26/40", "Q2": "28/50", "TERM EXAM": "32/60" }, rawGrade: { midterm: "2.5350", final: "2.5387", average: "2.5368" }, encodedGrade: { midterm: "2.50", final: "2.50" } },
+            "2022102015": { name: "CANUELA, Ella Buhay", midterm: { "S2": "6/10", "R1": "10/10", "Q1": "9/40", "Q2": "15/48", "TERM EXAM": "30/60" }, final: { "S1": "0/18", "Q1": "18/40", "Q2": "10/50", "TERM EXAM": "23/60" }, rawGrade: { midterm: "3.1771", final: "3.7900", average: "3.4836" }, encodedGrade: { midterm: "5.00", final: "5.00" } },
+            "2024100004": { name: "CASTRO, Princess Jewell Razon", midterm: { "S2": "5/10", "R1": "9/10", "Q1": "11/40", "Q2": "26/48", "TERM EXAM": "28/60" }, final: { "S1": "14/18", "Q1": "20/40", "Q2": "25/50", "TERM EXAM": "28/60" }, rawGrade: { midterm: "3.1017", final: "2.8933", average: "2.9975" }, encodedGrade: { midterm: "3.00", final: "3.00" } },
+            "2024101397": { name: "DEL MUNDO, John Kevin Valerio", midterm: { "S2": "1/10", "R1": "8/10", "Q1": "21/40", "Q2": "24/48", "TERM EXAM": "27/60" }, final: { "S1": "16/18", "Q1": "21/40", "Q2": "30/50", "TERM EXAM": "38/60" }, rawGrade: { midterm: "3.1000", final: "2.4267", average: "2.7633" }, encodedGrade: { midterm: "3.00", final: "2.75" } },
+            "2024100561": { name: "DIAZ, Jolina Mendaros", midterm: { "S2": "10/10", "R1": "9/10", "Q1": "23/40", "Q2": "41/48", "TERM EXAM": "41/60" }, final: { "S1": "18/18", "Q1": "25/40", "Q2": "35/50", "TERM EXAM": "40/60" }, rawGrade: { midterm: "2.1251", final: "2.1400", average: "2.1325" }, encodedGrade: { midterm: "2.00", final: "2.25" } },
+            "2024101480": { name: "ELLAMIL, Harley Jake Tubban", midterm: { "S2": "9/10", "R1": "10/10", "Q1": "26/40", "Q2": "35/48", "TERM EXAM": "39/60" }, final: { "S1": "18/18", "Q1": "21/40", "Q2": "35/50", "TERM EXAM": "39/60" }, rawGrade: { midterm: "2.1834", final: "2.2500", average: "2.2167" }, encodedGrade: { midterm: "2.25", final: "2.25" } },
+            "2024100737": { name: "EMAN, Darel Bagsic", midterm: { "S2": "8/10", "R1": "9/10", "Q1": "20/40", "Q2": "28/48", "TERM EXAM": "26/60" }, final: { "S1": "17/18", "Q1": "25/40", "Q2": "37/50", "TERM EXAM": "31/60" }, rawGrade: { midterm: "2.8583", final: "2.4113", average: "2.6348" }, encodedGrade: { midterm: "2.75", final: "2.75" } },
+            "2023101127": { name: "FELICIANO, Tom Russell Macaspac", midterm: { "S2": "5/10", "R1": "10/10", "Q1": "20/40", "Q2": "25/48", "TERM EXAM": "28/60" }, final: { "S1": "16/18", "Q1": "19/40", "Q2": "25/50", "TERM EXAM": "37/60" }, rawGrade: { midterm: "2.8933", final: "2.5767", average: "2.7350" }, encodedGrade: { midterm: "3.00", final: "2.75" } },
+            "2024101672": { name: "FERNANDEZ, Mark Angelo Patrick Balignasay", midterm: { "S2": "10/10", "R1": "10/10", "Q1": "19/40", "Q2": "31/48", "TERM EXAM": "30/60" }, final: { "S1": "16/18", "Q1": "23/40", "Q2": "32/50", "TERM EXAM": "39/60" }, rawGrade: { midterm: "2.6033", final: "2.3247", average: "2.4640" }, encodedGrade: { midterm: "2.50", final: "2.50" } },
+            "2023103836": { name: "FERRER, Mhar Antoni Nadal", midterm: { "S2": "6/10", "R1": "10/10", "Q1": "20/40", "Q2": "32/48", "TERM EXAM": "33/60" }, final: { "S1": "17/18", "Q1": "22/40", "Q2": "29/50", "TERM EXAM": "38/60" }, rawGrade: { midterm: "2.6288", final: "2.3893", average: "2.5091" }, encodedGrade: { midterm: "2.75", final: "2.50" } },
+            "2024801129": { name: "GAMALINDA, Erwin John Abad", midterm: { "S2": "9/10", "R1": "10/10", "Q1": "20/40", "Q2": "22/48", "TERM EXAM": "33/60" }, final: { "S1": "18/18", "Q1": "24/40", "Q2": "27/50", "TERM EXAM": "34/60" }, rawGrade: { midterm: "2.7054", final: "2.4680", average: "2.5867" }, encodedGrade: { midterm: "2.75", final: "2.50" } },
+            "2024100240": { name: "GARCIA, Kirsten Cyrille Cayanan", midterm: { "S2": "9/10", "R1": "10/10", "Q1": "17/40", "Q2": "16/48", "TERM EXAM": "27/60" }, final: { "S1": "15/18", "Q1": "22/40", "Q2": "25/50", "TERM EXAM": "35/60" }, rawGrade: { midterm: "3.0199", final: "2.6100", average: "2.8150" }, encodedGrade: { midterm: "3.00", final: "2.75" } },
+            "2024101453": { name: "GARCIA, Princess Fredah Guzman", midterm: { "S2": "8/10", "R1": "10/10", "Q1": "24/40", "Q2": "45/48", "TERM EXAM": "43/60" }, final: { "S1": "16/18", "Q1": "26/40", "Q2": "28/50", "TERM EXAM": "45/60" }, rawGrade: { midterm: "1.9631", final: "2.1487", average: "2.0559" }, encodedGrade: { midterm: "2.00", final: "2.00" } },
+            "2024100592": { name: "GERMINO, Mika Padawan", midterm: { "S2": "9/10", "R1": "10/10", "Q1": "14/40", "Q2": "20/48", "TERM EXAM": "37/60" }, final: { "S1": "16/18", "Q1": "22/40", "Q2": "35/50", "TERM EXAM": "39/60" }, rawGrade: { midterm: "2.7067", final: "2.2967", average: "2.5017" }, encodedGrade: { midterm: "2.75", final: "2.50" } },
+            "2024100745": { name: "HERMOGENO, Donna Mae Mabanta", midterm: { "S2": "10/10", "R1": "9/10", "Q1": "16/40", "Q2": "31/48", "TERM EXAM": "32/60" }, final: { "S1": "18/18", "Q1": "23/40", "Q2": "25/50", "TERM EXAM": "32/60" }, rawGrade: { midterm: "2.6813", final: "2.5800", average: "2.6307" }, encodedGrade: { midterm: "2.75", final: "2.75" } },
+            "2024101574": { name: "JALOTJOT, Christian Delos Reyes", midterm: { "S2": "10/10", "R1": "8/10", "Q1": "25/40", "Q2": "27/48", "TERM EXAM": "32/60" }, final: { "S1": "16/18", "Q1": "26/40", "Q2": "21/50", "TERM EXAM": "40/60" }, rawGrade: { midterm: "2.5500", final: "2.4107", average: "2.4803" }, encodedGrade: { midterm: "2.50", final: "2.50" } },
+            "2024101665": { name: "JAVIER, John Aron Dizon", midterm: { "S2": "10/10", "R1": "10/10", "Q1": "21/40", "Q2": "30/48", "TERM EXAM": "39/60" }, final: { "S1": "16/18", "Q1": "16/40", "Q2": "32/50", "TERM EXAM": "24/60" }, rawGrade: { midterm: "2.3367", final: "2.9147", average: "2.6257" }, encodedGrade: { midterm: "2.25", final: "2.50" } },
+            "2021300927": { name: "MADLANGBAYAN, Gabriel Aidan Liwanag", midterm: { "S2": "9/10", "R1": "10/10", "Q1": "15/40", "Q2": "15/48", "TERM EXAM": "30/60" }, final: { "S1": "16/18", "Q1": "22/40", "Q2": "20/50", "TERM EXAM": "24/60" }, rawGrade: { midterm: "2.9839", final: "2.9867", average: "2.9853" }, encodedGrade: { midterm: "3.00", final: "3.00" } },
+            "2024100267": { name: "MALLARI, Jonel Sicat", midterm: { "S2": "10/10", "R1": "9/10", "Q1": "18/40", "Q2": "25/48", "TERM EXAM": "25/60" }, final: { "S1": "16/18", "Q1": "20/40", "Q2": "27/50", "TERM EXAM": "39/60" }, rawGrade: { midterm: "2.9183", final: "2.4647", average: "2.6915" }, encodedGrade: { midterm: "3.00", final: "2.75" } },
+            "2024100023": { name: "MALONZO, Bea Ganitnit", midterm: { "S2": "5/10", "R1": "10/10", "Q1": "28/40", "Q2": "39/48", "TERM EXAM": "41/60" }, final: { "S1": "18/18", "Q1": "26/40", "Q2": "41/50", "TERM EXAM": "41/60" }, rawGrade: { midterm: "2.1100", final: "1.9940", average: "2.0520" }, encodedGrade: { midterm: "2.00", final: "2.00" } },
+            "2024100359": { name: "MAMUAD, Shaina Marie Del Mar", midterm: { "S2": "10/10", "R1": "10/10", "Q1": "26/40", "Q2": "31/48", "TERM EXAM": "30/60" }, final: { "S1": "18/18", "Q1": "25/40", "Q2": "36/50", "TERM EXAM": "39/60" }, rawGrade: { midterm: "2.4672", final: "2.1540", average: "2.3106" }, encodedGrade: { midterm: "2.50", final: "2.25" } },
+            "2022100446": { name: "MANGAMPO, Carl Jhonson Manzano", midterm: { "S2": "0/10", "R1": "8/10", "Q1": "13/40", "Q2": "3/48", "TERM EXAM": "17/60" }, final: { "S1": "0/18", "Q1": "0/40", "Q2": "23/50", "TERM EXAM": "27/60" }, rawGrade: { midterm: "3.9400", final: "3.8220", average: "3.8810" }, encodedGrade: { midterm: "5.00", final: "5.00" } },
+            "2024801686": { name: "MANICAD, John Arvin Gonzales", midterm: { "S2": "10/10", "R1": "10/10", "Q1": "20/40", "Q2": "28/48", "TERM EXAM": "34/60" }, final: { "S1": "17/18", "Q1": "25/40", "Q2": "36/50", "TERM EXAM": "38/60" }, rawGrade: { midterm: "2.5445", final: "2.2173", average: "2.3809" }, encodedGrade: { midterm: "2.50", final: "2.50" } },
+            "2024100442": { name: "MANUEL, Marjon Pagaling", midterm: { "S2": "10/10", "R1": "8/10", "Q1": "32/40", "Q2": "34/48", "TERM EXAM": "35/60" }, final: { "S1": "17/18", "Q1": "29/40", "Q2": "36/50", "TERM EXAM": "36/60" }, rawGrade: { midterm: "2.2336", final: "2.1973", average: "2.2155" }, encodedGrade: { midterm: "2.25", final: "2.25" } },
+            "2024100415": { name: "MANZANO, Diether Depayso", midterm: { "S2": "10/10", "R1": "10/10", "Q1": "33/40", "Q2": "36/48", "TERM EXAM": "36/60" }, final: { "S1": "17/18", "Q1": "30/40", "Q2": "33/50", "TERM EXAM": "35/60" }, rawGrade: { midterm: "2.0894", final: "2.2553", average: "2.1724" }, encodedGrade: { midterm: "2.00", final: "2.25" } },
+            "2024801090": { name: "MASANQUE, Adilene Grace Regala", midterm: { "S2": "10/10", "R1": "9/10", "Q1": "17/40", "Q2": "24/48", "TERM EXAM": "29/60" }, final: { "S1": "16/18", "Q1": "24/40", "Q2": "26/50", "TERM EXAM": "32/60" }, rawGrade: { midterm: "2.8350", final: "2.6107", average: "2.7228" }, encodedGrade: { midterm: "2.75", final: "2.75" } },
+            "2024101048": { name: "MELEGRITO, Sophia Lianne Rose Valete", midterm: { "S2": "10/10", "R1": "10/10", "Q1": "25/40", "Q2": "22/48", "TERM EXAM": "32/60" }, final: { "S1": "17/18", "Q1": "25/40", "Q2": "40/50", "TERM EXAM": "19/60" }, rawGrade: { midterm: "2.6063", final: "2.7233", average: "2.6648" }, encodedGrade: { midterm: "2.50", final: "2.75" } },
+            "2024100771": { name: "NATAD, Faith Arwen Cruz", midterm: { "S2": "4/10", "R1": "9/10", "Q1": "14/40", "Q2": "22/48", "TERM EXAM": "34/60" }, final: { "S1": "18/18", "Q1": "17/40", "Q2": "30/50", "TERM EXAM": "24/60" }, rawGrade: { midterm: "2.9895", final: "2.8600", average: "2.9248" }, encodedGrade: { midterm: "3.00", final: "3.00" } },
+            "2024100332": { name: "OVEJERA, Queena Fame Manuel", midterm: { "S2": "10/10", "R1": "10/10", "Q1": "28/40", "Q2": "25/48", "TERM EXAM": "30/60" }, final: { "S1": "16/18", "Q1": "25/40", "Q2": "33/50", "TERM EXAM": "39/60" }, rawGrade: { midterm: "2.5272", final: "2.2687", average: "2.3980" }, encodedGrade: { midterm: "2.50", final: "2.50" } },
+            "2024100313": { name: "PAEZ, Mark Joseph Dungca", midterm: { "S2": "10/10", "R1": "8/10", "Q1": "12/40", "Q2": "17/48", "TERM EXAM": "28/60" }, final: { "S1": "13/18", "Q1": "22/40", "Q2": "22/50", "TERM EXAM": "27/60" }, rawGrade: { midterm: "3.1117", final: "2.9647", average: "3.0382" }, encodedGrade: { midterm: "3.00", final: "3.00" } },
+            "2024100124": { name: "PASION, Joshua Emmanuel Dizon", midterm: { "S2": "9/10", "R1": "10/10", "Q1": "6/40", "Q2": "17/48", "TERM EXAM": "24/60" }, final: { "S1": "15/18", "Q1": "16/40", "Q2": "19/50", "TERM EXAM": "24/60" }, rawGrade: { midterm: "3.3067", final: "3.1560", average: "3.2313" }, encodedGrade: { midterm: "5.00", final: "5.00" } },
+            "2024101799": { name: "PEREZ, Mary Grace _", midterm: { "S2": "0/10", "R1": "10/10", "Q1": "13/40", "Q2": "14/48", "TERM EXAM": "15/60" }, final: { "S1": "12/18", "Q1": "17/40", "Q2": "16/50", "TERM EXAM": "22/60" }, rawGrade: { midterm: "3.7567", final: "3.3440", average: "3.5503" }, encodedGrade: { midterm: "5.00", final: "5.00" } },
+            "2024100675": { name: "PIÑERO, Nicolesie Asuncion", midterm: { "S2": "10/10", "R1": "9/10", "Q1": "26/40", "Q2": "18/48", "TERM EXAM": "29/60" }, final: { "S1": "17/18", "Q1": "20/40", "Q2": "39/50", "TERM EXAM": "30/60" }, rawGrade: { midterm: "2.7598", final: "2.5093", average: "2.6346" }, encodedGrade: { midterm: "2.75", final: "2.75" } },
+            "2024800795": { name: "RAMOS, Angelika Mae", midterm: { "S2": "10/10", "R1": "10/10", "Q1": "8/40", "Q2": "14/48", "TERM EXAM": "19/60" }, final: { "S1": "18/18", "Q1": "23/40", "Q2": "25/50", "TERM EXAM": "32/60" }, rawGrade: { midterm: "3.4661", final: "2.5800", average: "3.0230" }, encodedGrade: { midterm: "5.00", final: "3.00" } },
+            "2024100987": { name: "RITA, Hazel Anne Lazaro", midterm: { "S2": "3/10", "R1": "10/10", "Q1": "16/40", "Q2": "30/48", "TERM EXAM": "36/60" }, final: { "S1": "17/18", "Q1": "23/40", "Q2": "29/50", "TERM EXAM": "37/60" }, rawGrade: { midterm: "2.7100", final: "2.3993", average: "2.5547" }, encodedGrade: { midterm: "2.75", final: "2.50" } },
+            "2024100960": { name: "SADUCOS, Isagani, Jr. Sanchez", midterm: { "S2": "10/10", "R1": "10/10", "Q1": "20/40", "Q2": "41/48", "TERM EXAM": "35/60" }, final: { "S1": "18/18", "Q1": "28/40", "Q2": "32/50", "TERM EXAM": "37/60" }, rawGrade: { midterm: "2.2667", final: "2.2180", average: "2.2423" }, encodedGrade: { midterm: "2.25", final: "2.25" } },
+            "2024100295": { name: "SALES, Jeni Lorain Gomez", midterm: { "S2": "5/10", "R1": "10/10", "Q1": "19/40", "Q2": "30/48", "TERM EXAM": "29/60" }, final: { "S1": "16/18", "Q1": "23/40", "Q2": "17/50", "TERM EXAM": "28/60" }, rawGrade: { midterm: "2.8048", final: "2.8947", average: "2.8497" }, encodedGrade: { midterm: "2.75", final: "2.75" } },
+            "2024100263": { name: "SANTOS, James Ryan Dela Rosa", midterm: { "S2": "10/10", "R1": "9/10", "Q1": "15/40", "Q2": "24/48", "TERM EXAM": "33/60" }, final: { "S1": "18/18", "Q1": "20/40", "Q2": "31/50", "TERM EXAM": "27/60" }, rawGrade: { midterm: "2.7550", final: "2.6940", average: "2.7245" }, encodedGrade: { midterm: "2.75", final: "2.75" } },
+            "2024101361": { name: "STA. MARINA, Jennylyn Fabian", midterm: { "S2": "0/10", "R1": "10/10", "Q1": "13/40", "Q2": "30/48", "TERM EXAM": "37/60" }, final: { "S1": "18/18", "Q1": "24/40", "Q2": "32/50", "TERM EXAM": "34/60" }, rawGrade: { midterm: "2.8585", final: "2.3880", average: "2.6233" }, encodedGrade: { midterm: "2.75", final: "2.50" } },
+            "2024101346": { name: "TIONGSON, Jeddah Andaya", midterm: { "S2": "10/10", "R1": "10/10", "Q1": "14/40", "Q2": "26/48", "TERM EXAM": "24/60" }, final: { "S1": "18/18", "Q1": "19/40", "Q2": "24/50", "TERM EXAM": "26/60" }, rawGrade: { midterm: "2.9760", final: "2.8560", average: "2.9160" }, encodedGrade: { midterm: "3.00", final: "3.00" } },
+            "2023100226": { name: "TIRU, James Cadiang", midterm: { "S2": "9/10", "R1": "10/10", "Q1": "26/40", "Q2": "25/48", "TERM EXAM": "38/60" }, final: { "S1": "16/18", "Q1": "25/40", "Q2": "28/50", "TERM EXAM": "35/60" }, rawGrade: { midterm: "2.3809", final: "2.4687", average: "2.4248" }, encodedGrade: { midterm: "2.50", final: "2.50" } },
+            "2024100017": { name: "TOLENTINO, Kenneth Glen Pineda", midterm: { "S2": "5/10", "R1": "10/10", "Q1": "18/40", "Q2": "24/48", "TERM EXAM": "33/60" }, final: { "S1": "18/18", "Q1": "29/40", "Q2": "32/50", "TERM EXAM": "41/60" }, rawGrade: { midterm: "2.8321", final: "2.0780", average: "2.4551" }, encodedGrade: { midterm: "2.75", final: "2.50" } },
+            "2022201207": { name: "TOLENTINO, Mark Angelo Mendoza", midterm: { "S2": "2/10", "R1": "9/10", "Q1": "10/40", "Q2": "12/48", "TERM EXAM": "24/60" }, final: { "S1": "15/18", "Q1": "11/40", "Q2": "15/50", "TERM EXAM": "19/60" }, rawGrade: { midterm: "3.5650", final: "3.4700", average: "3.5175" }, encodedGrade: { midterm: "5.00", final: "5.00" } },
+            "2024100396": { name: "TRINIDAD, Albert Ryan Restua", midterm: { "S2": "5/10", "R1": "8/10", "Q1": "6/40", "Q2": "22/48", "TERM EXAM": "17/60" }, final: { "S1": "15/18", "Q1": "12/40", "Q2": "15/50", "TERM EXAM": "28/60" }, rawGrade: { midterm: "3.6289", final: "3.1800", average: "3.4045" }, encodedGrade: { midterm: "5.00", final: "5.00" } },
+            "2024100222": { name: "TRINIDAD, James Nathaniel Villamayor", midterm: { "S2": "2/10", "R1": "10/10", "Q1": "7/40", "Q2": "17/48", "TERM EXAM": "24/60" }, final: { "S1": "15/18", "Q1": "18/40", "Q2": "15/50", "TERM EXAM": "24/60" }, rawGrade: { midterm: "3.5060", final: "3.1800", average: "3.3430" }, encodedGrade: { midterm: "5.00", final: "5.00" } },
+            "2024101562": { name: "UYCOCO, Cayle Jaztin Nodora", midterm: { "S2": "0/10", "R1": "10/10", "Q1": "9/40", "Q2": "20/48", "TERM EXAM": "17/60" }, final: { "S1": "16/18", "Q1": "25/40", "Q2": "25/50", "TERM EXAM": "36/60" }, rawGrade: { midterm: "3.6767", final: "2.4867", average: "3.0817" }, encodedGrade: { midterm: "5.00", final: "3.00" } },
+            "2024100241": { name: "VINUYA, Andrea Bayani", midterm: { "S2": "8/10", "R1": "9/10", "Q1": "12/40", "Q2": "25/48", "TERM EXAM": "32/60" }, final: { "S1": "17/18", "Q1": "17/40", "Q2": "19/50", "TERM EXAM": "27/60" }, rawGrade: { midterm: "2.9213", final: "2.9793", average: "2.9503" }, encodedGrade: { midterm: "3.00", final: "3.00" } },
+            "2024100028": { name: "ADAJAR, Janna Pauline Sacman", midterm: { "S2": "5/10", "R1": "9/10", "Q1": "18/40", "Q2": "19/48", "TERM EXAM": "29/60" }, final: { "S1": "17/18", "Q1": "29/40", "Q2": "34/50", "TERM EXAM": "33/60" }, rawGrade: { midterm: "3.0363", final: "2.3193", average: "2.6778" }, encodedGrade: { midterm: "3.00", final: "2.75" } },
+            "2024100303": { name: "AGUSTIN, Angelic Gael Suti", midterm: { "S2": "9/10", "R1": "10/10", "Q1": "21/40", "Q2": "23/48", "TERM EXAM": "24/60" }, final: { "S1": "16/18", "Q1": "18/40", "Q2": "22/50", "TERM EXAM": "37/60" }, rawGrade: { midterm: "2.9067", final: "2.6447", average: "2.7757" }, encodedGrade: { midterm: "3.00", final: "2.75" } },
+            "2024100259": { name: "ALONZO, Rasheed Dominique Refugia", midterm: { "S2": "4/10", "R1": "10/10", "Q1": "18/40", "Q2": "18/48", "TERM EXAM": "28/60" }, final: { "S1": "17/18", "Q1": "23/40", "Q2": "28/50", "TERM EXAM": "40/60" }, rawGrade: { midterm: "3.0800", final: "2.3253", average: "2.7027" }, encodedGrade: { midterm: "3.00", final: "2.75" } },
+            "2024100867": { name: "ARCE, Stephen Josh Tababa", midterm: { "S2": "8/10", "R1": "6/10", "Q1": "13/40", "Q2": "20/48", "TERM EXAM": "25/60" }, final: { "S1": "18/18", "Q1": "19/40", "Q2": "16/50", "TERM EXAM": "31/60" }, rawGrade: { midterm: "3.2367", final: "2.8340", average: "3.0353" }, encodedGrade: { midterm: "5.00", final: "3.00" } },
+            "2023100522": { name: "BANTIGUE, Daniela Joy Eria", midterm: { "S2": "5/10", "R1": "10/10", "Q1": "21/40", "Q2": "18/48", "TERM EXAM": "25/60" }, final: { "S1": "18/18", "Q1": "21/40", "Q2": "25/50", "TERM EXAM": "35/60" }, rawGrade: { midterm: "3.0740", final: "2.5300", average: "2.8020" }, encodedGrade: { midterm: "3.00", final: "2.75" } },
+            "2024101631": { name: "CABRERA, Mark Angelo Baltazar", midterm: { "S2": "8/10", "R1": "10/10", "Q1": "10/40", "Q2": "18/48", "TERM EXAM": "35/60" }, final: { "S1": "17/18", "Q1": "17/40", "Q2": "25/50", "TERM EXAM": "25/60" }, rawGrade: { midterm: "2.9100", final: "2.9433", average: "2.9267" }, encodedGrade: { midterm: "3.00", final: "3.00" } },
+            "2023300428": { name: "CAMPO, Irvine Lugtu", midterm: { "S2": "9/10", "R1": "10/10", "Q1": "23/40", "Q2": "16/48", "TERM EXAM": "31/60" }, final: { "S1": "17/18", "Q1": "21/40", "Q2": "21/50", "TERM EXAM": "30/60" }, rawGrade: { midterm: "2.7733", final: "2.7773", average: "2.7753" }, encodedGrade: { midterm: "2.75", final: "2.75" } },
+            "2023101120": { name: "CAOAGDAN, Charlene Olfindo", midterm: { "S2": "8/10", "R1": "10/10", "Q1": "28/40", "Q2": "27/48", "TERM EXAM": "36/60" }, final: { "S1": "18/18", "Q1": "23/40", "Q2": "28/50", "TERM EXAM": "31/60" }, rawGrade: { midterm: "2.3700", final: "2.5620", average: "2.4660" }, encodedGrade: { midterm: "2.25", final: "2.50" } },
+            "2024101272": { name: "CORTES, Jobelle Villanueva", midterm: { "S2": "5/10", "R1": "10/10", "Q1": "19/40", "Q2": "31/48", "TERM EXAM": "29/60" }, final: { "S1": "17/18", "Q1": "25/40", "Q2": "29/50", "TERM EXAM": "44/60" }, rawGrade: { midterm: "2.7833", final: "2.1493", average: "2.4663" }, encodedGrade: { midterm: "2.75", final: "2.50" } },
+            "2024801563": { name: "DOMINGO, Ralph Christian Tañedo", midterm: { "S2": "5/10", "R1": "10/10", "Q1": "17/40", "Q2": "11/48", "TERM EXAM": "24/60" }, final: { "S1": "16/18", "Q1": "17/40", "Q2": "21/50", "TERM EXAM": "37/60" }, rawGrade: { midterm: "3.3022", final: "2.6807", average: "2.9914" }, encodedGrade: { midterm: "5.00", final: "3.00" } },
+            "2024101681": { name: "EDUARTE, Eduardo Romeo II Salazar", midterm: { "S2": "7/10", "R1": "10/10", "Q1": "21/40", "Q2": "26/48", "TERM EXAM": "33/60" }, final: { "S1": "17/18", "Q1": "17/40", "Q2": "27/50", "TERM EXAM": "36/60" }, rawGrade: { midterm: "2.6467", final: "2.5813", average: "2.6140" }, encodedGrade: { midterm: "2.75", final: "2.50" } },
+            "2023101270": { name: "FRANCIA, Grachel Joy Casingal", midterm: { "S2": "7/10", "R1": "9/10", "Q1": "11/40", "Q2": "15/48", "TERM EXAM": "26/60" }, final: { "S1": "16/18", "Q1": "15/40", "Q2": "23/50", "TERM EXAM": "25/60" }, rawGrade: { midterm: "3.2775", final: "3.0487", average: "3.1631" }, encodedGrade: { midterm: "5.00", final: "5.00" } },
+            "2024101393": { name: "GABRIEL, Gabriel Franchesco Santos", midterm: { "S2": "4/10", "R1": "9/10", "Q1": "5/40", "Q2": "14/48", "TERM EXAM": "21/60" }, final: { "S1": "16/18", "Q1": "12/40", "Q2": "19/50", "TERM EXAM": "17/60" }, rawGrade: { midterm: "3.6617", final: "3.4127", average: "3.5372" }, encodedGrade: { midterm: "5.00", final: "5.00" } },
+            "2023101144": { name: "GABRIEL, Lander Cabinian", midterm: { "S2": "4/10", "R1": "10/10", "Q1": "26/40", "Q2": "37/48", "TERM EXAM": "34/60" }, final: { "S1": "17/18", "Q1": "20/40", "Q2": "31/50", "TERM EXAM": "36/60" }, rawGrade: { midterm: "2.4233", final: "2.4573", average: "2.4403" }, encodedGrade: { midterm: "2.50", final: "2.50" } },
+            "2024101186": { name: "GOMEZ, Charm Iya Leeane Pheona Lacanlale", midterm: { "S2": "2/10", "R1": "10/10", "Q1": "12/40", "Q2": "16/48", "TERM EXAM": "19/60" }, final: { "S1": "16/18", "Q1": "15/40", "Q2": "11/50", "TERM EXAM": "16/60" }, rawGrade: { midterm: "3.5663", final: "3.5107", average: "3.5385" }, encodedGrade: { midterm: "5.00", final: "5.00" } },
+            "2024101017": { name: "GONZALES, Dianne Emmanuelle Sales", midterm: { "S2": "7/10", "R1": "10/10", "Q1": "12/40", "Q2": "21/48", "TERM EXAM": "27/60" }, final: { "S1": "17/18", "Q1": "22/40", "Q2": "23/50", "TERM EXAM": "28/60" }, rawGrade: { midterm: "3.0810", final: "2.7853", average: "2.9332" }, encodedGrade: { midterm: "3.00", final: "3.00" } },
+            "2023100604": { name: "GOPEZ, Dexter Jane Sanchez", midterm: { "S2": "4/10", "R1": "8/10", "Q1": "9/40", "Q2": "17/48", "TERM EXAM": "31/60" }, final: { "S1": "17/18", "Q1": "22/40", "Q2": "29/50", "TERM EXAM": "23/60" }, rawGrade: { midterm: "3.2467", final: "2.8393", average: "3.0430" }, encodedGrade: { midterm: "5.00", final: "3.00" } },
+            "2024101309": { name: "GRANIL, Erick Tangonan", midterm: { "S2": "2/10", "R1": "10/10", "Q1": "15/40", "Q2": "23/48", "TERM EXAM": "23/60" }, final: { "S1": "15/18", "Q1": "23/40", "Q2": "20/50", "TERM EXAM": "37/60" }, rawGrade: { midterm: "3.2637", final: "2.6100", average: "2.9368" }, encodedGrade: { midterm: "5.00", final: "3.00" } },
+            "2024800156": { name: "GUERRERO, Jazmine Laquindanum", midterm: { "S2": "3/10", "R1": "10/10", "Q1": "16/40", "Q2": "20/48", "TERM EXAM": "38/60" }, final: { "S1": "18/18", "Q1": "24/40", "Q2": "30/50", "TERM EXAM": "42/60" }, rawGrade: { midterm: "2.8227", final: "2.1800", average: "2.5013" }, encodedGrade: { midterm: "2.75", final: "2.50" } },
+            "2023102545": { name: "GUIEB, Crystal Joy Caputol", midterm: { "S2": "9/10", "R1": "10/10", "Q1": "16/40", "Q2": "19/48", "TERM EXAM": "28/60" }, final: { "S1": "14/18", "Q1": "15/40", "Q2": "23/50", "TERM EXAM": "32/60" }, rawGrade: { midterm: "2.9533", final: "2.9053", average: "2.9293" }, encodedGrade: { midterm: "3.00", final: "3.00" } },
+            "2024100010": { name: "HIPOLITO, Atasha Czeline Halili", midterm: { "S2": "4/10", "R1": "10/10", "Q1": "11/40", "Q2": "18/48", "TERM EXAM": "27/60" }, final: { "S1": "14/18", "Q1": "20/40", "Q2": "21/50", "TERM EXAM": "30/60" }, rawGrade: { midterm: "3.2500", final: "2.8973", average: "3.0737" }, encodedGrade: { midterm: "5.00", final: "3.00" } },
+            "2022100315": { name: "LOPEZ, Rodchill Manalastas", midterm: { "S2": "3/10", "R1": "10/10", "Q1": "18/40", "Q2": "19/48", "TERM EXAM": "26/60" }, final: { "S1": "14/18", "Q1": "20/40", "Q2": "18/50", "TERM EXAM": "36/60" }, rawGrade: { midterm: "3.1533", final: "2.7653", average: "2.9593" }, encodedGrade: { midterm: "5.00", final: "3.00" } },
+            "2023101051": { name: "LUMIBAO, Carl Simon Liquiran", midterm: { "S2": "8/10", "R1": "10/10", "Q1": "4/40", "Q2": "17/48", "TERM EXAM": "26/60" }, final: { "S1": "18/18", "Q1": "19/40", "Q2": "19/50", "TERM EXAM": "24/60" }, rawGrade: { midterm: "3.3167", final: "2.9960", average: "3.1563" }, encodedGrade: { midterm: "5.00", final: "5.00" } },
+            "2023100902": { name: "MABUNGA, Vladimer Tudla", midterm: { "S2": "4/10", "R1": "10/10", "Q1": "15/40", "Q2": "21/48", "TERM EXAM": "22/60" }, final: { "S1": "14/18", "Q1": "17/40", "Q2": "25/50", "TERM EXAM": "25/60" }, rawGrade: { midterm: "3.2700", final: "3.0433", average: "3.1567" }, encodedGrade: { midterm: "5.00", final: "5.00" } },
+            "2022103317": { name: "MAGTOTO, Aira Marie Dizon", midterm: { "S2": "0/10", "R1": "10/10", "Q1": "2/40", "Q2": "13/48", "TERM EXAM": "19/60" }, final: { "S1": "15/18", "Q1": "16/40", "Q2": "16/50", "TERM EXAM": "25/60" }, rawGrade: { midterm: "3.8733", final: "3.1740", average: "3.5237" }, encodedGrade: { midterm: "5.00", final: "5.00" } },
+            "2023101275": { name: "MALLARI, Liana Marielle Canda", midterm: { "S2": "7/10", "R1": "10/10", "Q1": "25/40", "Q2": "37/48", "TERM EXAM": "36/60" }, final: { "S1": "13/18", "Q1": "24/40", "Q2": "31/50", "TERM EXAM": "42/60" }, rawGrade: { midterm: "2.2933", final: "2.3307", average: "2.3120" }, encodedGrade: { midterm: "2.25", final: "2.25" } },
+            "2023203353": { name: "MANUEL, Nicolle Anne Dijamco", midterm: { "S2": "3/10", "R1": "9/10", "Q1": "12/40", "Q2": "16/48", "TERM EXAM": "17/60" }, final: { "S1": "14/18", "Q1": "16/40", "Q2": "18/50", "TERM EXAM": "25/60" }, rawGrade: { midterm: "3.6383", final: "3.1753", average: "3.4068" }, encodedGrade: { midterm: "5.00", final: "5.00" } },
+            "2024100201": { name: "MAURICIO, Maria Princess Rone", midterm: { "S2": "7/10", "R1": "10/10", "Q1": "23/40", "Q2": "22/48", "TERM EXAM": "29/60" }, final: { "S1": "17/18", "Q1": "23/40", "Q2": "29/50", "TERM EXAM": "41/60" }, rawGrade: { midterm: "2.7813", final: "2.2793", average: "2.5303" }, encodedGrade: { midterm: "2.75", final: "2.50" } },
+            "2024100238": { name: "MIRANDA, Mark Laurenz Yandan", midterm: { "S2": "5/10", "R1": "8/10", "Q1": "10/40", "Q2": "12/48", "TERM EXAM": "19/60" }, final: { "S1": "17/18", "Q1": "9/40", "Q2": "18/50", "TERM EXAM": "21/60" }, rawGrade: { midterm: "3.6430", final: "3.3353", average: "3.4892" }, encodedGrade: { midterm: "5.00", final: "5.00" } },
+            "2024101742": { name: "NAVAERA, Adiel Brina De Dios", midterm: { "S2": "3/10", "R1": "10/10", "Q1": "5/40", "Q2": "15/48", "TERM EXAM": "23/60" }, final: { "S1": "16/18", "Q1": "12/40", "Q2": "15/50", "TERM EXAM": "24/60" }, rawGrade: { midterm: "3.5700", final: "3.2667", average: "3.4183" }, encodedGrade: { midterm: "5.00", final: "5.00" } },
+            "2024101136": { name: "NOORA, Lance Cedrick Borinaga", midterm: { "S2": "6/10", "R1": "10/10", "Q1": "14/40", "Q2": "23/48", "TERM EXAM": "30/60" }, final: { "S1": "18/18", "Q1": "27/40", "Q2": "22/50", "TERM EXAM": "34/60" }, rawGrade: { midterm: "2.9567", final: "2.4880", average: "2.7223" }, encodedGrade: { midterm: "3.00", final: "2.75" } },
+            "2024100268": { name: "NOVALES, Kristine Cielo De Vera", midterm: { "S2": "5/10", "R1": "10/10", "Q1": "21/40", "Q2": "25/48", "TERM EXAM": "36/60" }, final: { "S1": "16/18", "Q1": "21/40", "Q2": "23/50", "TERM EXAM": "28/60" }, rawGrade: { midterm: "2.6423", final: "2.8387", average: "2.7405" }, encodedGrade: { midterm: "2.75", final: "2.75" } },
+            "2023100013": { name: "ORZAME, Ryza Karylle Espinoli", midterm: { "S2": "4/10", "R1": "9/10", "Q1": "21/40", "Q2": "12/48", "TERM EXAM": "19/60" }, final: { "S1": "16/18", "Q1": "22/40", "Q2": "24/50", "TERM EXAM": "33/60" }, rawGrade: { midterm: "3.4350", final: "2.6527", average: "3.0438" }, encodedGrade: { midterm: "5.00", final: "3.00" } },
+            "2024100227": { name: "PAGADUAN, Gerald Manalastas", midterm: { "S2": "4/10", "R1": "9/10", "Q1": "20/40", "Q2": "25/48", "TERM EXAM": "29/60" }, final: { "S1": "16/18", "Q1": "26/40", "Q2": "28/50", "TERM EXAM": "33/60" }, rawGrade: { midterm: "2.9383", final: "2.5087", average: "2.7235" }, encodedGrade: { midterm: "3.00", final: "2.75" } },
+            "2024100895": { name: "PAULO, Paula Marie Torres", midterm: { "S2": "4/10", "R1": "8/10", "Q1": "8/40", "Q2": "11/48", "TERM EXAM": "20/60" }, final: { "S1": "12/18", "Q1": "19/40", "Q2": "14/50", "TERM EXAM": "18/60" }, rawGrade: { midterm: "3.6817", final: "3.4560", average: "3.5688" }, encodedGrade: { midterm: "5.00", final: "5.00" } },
+            "2023101959": { name: "PELAYO, Cyrene De Lara", midterm: { "S2": "8/10", "R1": "10/10", "Q1": "24/40", "Q2": "20/48", "TERM EXAM": "34/60" }, final: { "S1": "15/18", "Q1": "28/40", "Q2": "30/50", "TERM EXAM": "43/60" }, rawGrade: { midterm: "2.6267", final: "2.1700", average: "2.3983" }, encodedGrade: { midterm: "2.75", final: "2.50" } },
+            "2023101469": { name: "PEREZ, Leeann Nathaly Dungca", midterm: { "S2": "0/10", "R1": "10/10", "Q1": "11/40", "Q2": "11/48", "TERM EXAM": "22/60" }, final: { "S1": "11/18", "Q1": "10/40", "Q2": "12/50", "TERM EXAM": "22/60" }, rawGrade: { midterm: "3.6367", final: "3.5813", average: "3.6090" }, encodedGrade: { midterm: "5.00", final: "5.00" } },
+            "2023104153": { name: "PERNITES, Angel Faye Guevarra", midterm: { "S2": "6/10", "R1": "9/10", "Q1": "9/40", "Q2": "12/48", "TERM EXAM": "23/60" }, final: { "S1": "18/18", "Q1": "16/40", "Q2": "15/50", "TERM EXAM": "27/60" }, rawGrade: { midterm: "3.4950", final: "3.0300", average: "3.2625" }, encodedGrade: { midterm: "5.00", final: "5.00" } },
+            "2024803163": { name: "PINEDA, Marielle Tiru", midterm: { "S2": "4/10", "R1": "10/10", "Q1": "21/40", "Q2": "28/48", "TERM EXAM": "35/60" }, final: { "S1": "16/18", "Q1": "24/40", "Q2": "28/50", "TERM EXAM": "32/60" }, rawGrade: { midterm: "2.6538", final: "2.5787", average: "2.6163" }, encodedGrade: { midterm: "2.75", final: "2.50" } },
+            "2024100287": { name: "PUNZALAN, John Edward", midterm: { "S2": "6/10", "R1": "10/10", "Q1": "13/40", "Q2": "13/48", "TERM EXAM": "27/60" }, final: { "S1": "16/18", "Q1": "19/40", "Q2": "22/50", "TERM EXAM": "25/60" }, rawGrade: { midterm: "3.2243", final: "2.9847", average: "3.1045" }, encodedGrade: { midterm: "5.00", final: "3.00" } },
+            "2024100633": { name: "SANCHEZ, Roi Vince Quimado", midterm: { "S2": "6/10", "R1": "9/10", "Q1": "22/40", "Q2": "32/48", "TERM EXAM": "38/60" }, final: { "S1": "17/18", "Q1": "28/40", "Q2": "34/50", "TERM EXAM": "34/60" }, rawGrade: { midterm: "2.4517", final: "2.3093", average: "2.3805" }, encodedGrade: { midterm: "2.50", final: "2.50" } },
+            "2024100916": { name: "SANGALANG, Kenneth Brian Manalang", midterm: { "S2": "4/10", "R1": "9/10", "Q1": "16/40", "Q2": "23/48", "TERM EXAM": "26/60" }, final: { "S1": "16/18", "Q1": "24/40", "Q2": "23/50", "TERM EXAM": "36/60" }, rawGrade: { midterm: "3.1342", final: "2.5387", average: "2.8364" }, encodedGrade: { midterm: "3.00", final: "2.75" } },
+            "2024100601": { name: "SICAT, Lleonise Danne Fernando", midterm: { "S2": "5/10", "R1": "9/10", "Q1": "18/40", "Q2": "26/48", "TERM EXAM": "34/60" }, final: { "S1": "16/18", "Q1": "24/40", "Q2": "27/50", "TERM EXAM": "37/60" }, rawGrade: { midterm: "2.7937", final: "2.4447", average: "2.6192" }, encodedGrade: { midterm: "2.75", final: "2.50" } },
+            "2024100220": { name: "SILVESTRE, Kristiann Lloyd", midterm: { "S2": "8/10", "R1": "10/10", "Q1": "8/40", "Q2": "22/48", "TERM EXAM": "22/60" }, final: { "S1": "15/18", "Q1": "21/40", "Q2": "22/50", "TERM EXAM": "35/60" }, rawGrade: { midterm: "3.2733", final: "2.6780", average: "2.9757" }, encodedGrade: { midterm: "5.00", final: "3.00" } },
+            "2023100949": { name: "SORIANO, Carla Shane Monteza", midterm: { "S2": "6/10", "R1": "10/10", "Q1": "18/40", "Q2": "20/48", "TERM EXAM": "26/60" }, final: { "S1": "16/18", "Q1": "18/40", "Q2": "25/50", "TERM EXAM": "22/60" }, rawGrade: { midterm: "3.0467", final: "3.0467", average: "3.0467" }, encodedGrade: { midterm: "3.00", final: "3.00" } },
+            "2024101267": { name: "TAGUINOD, John Patrick Bautista", midterm: { "S2": "1/10", "R1": "8/10", "Q1": "7/40", "Q2": "13/48", "TERM EXAM": "28/60" }, final: { "S1": "9/18", "Q1": "14/40", "Q2": "16/50", "TERM EXAM": "29/60" }, rawGrade: { midterm: "3.5483", final: "3.2940", average: "3.4212" }, encodedGrade: { midterm: "5.00", final: "5.00" } },
+            "2024101368": { name: "TAMIANA, Maxine Beatrice Saplan", midterm: { "S2": "11/10", "R1": "9/10", "Q1": "22/40", "Q2": "35/48", "TERM EXAM": "36/60" }, final: { "S1": "18/18", "Q1": "23/40", "Q2": "30/50", "TERM EXAM": "42/60" }, rawGrade: { midterm: "2.3117", final: "2.2000", average: "2.2558" }, encodedGrade: { midterm: "2.25", final: "2.25" } },
+            "2024100851": { name: "TOLENTINO, Ciara Kate Dizon", midterm: { "S2": "2/10", "R1": "10/10", "Q1": "7/40", "Q2": "23/48", "TERM EXAM": "25/60" }, final: { "S1": "16/18", "Q1": "18/40", "Q2": "16/50", "TERM EXAM": "33/60" }, rawGrade: { midterm: "3.3667", final: "2.8607", average: "3.1137" }, encodedGrade: { midterm: "5.00", final: "3.00" } },
+            "2023101408": { name: "TOLENTINO, Mary Agnes Navarro", midterm: { "S2": "10/10", "R1": "10/10", "Q1": "12/40", "Q2": "19/48", "TERM EXAM": "35/60" }, final: { "S1": "14/18", "Q1": "16/40", "Q2": "16/50", "TERM EXAM": "26/60" }, rawGrade: { midterm: "2.7933", final: "3.1773", average: "2.9853" }, encodedGrade: { midterm: "2.75", final: "3.00" } },
+            "2023100545": { name: "TORRES, Blessilda Ann Dela Cruz", midterm: { "S2": "4/10", "R1": "10/10", "Q1": "8/40", "Q2": "12/48", "TERM EXAM": "19/60" }, final: { "S1": "9/18", "Q1": "14/40", "Q2": "16/50", "TERM EXAM": "22/60" }, rawGrade: { midterm: "3.6500", final: "3.5040", average: "3.5770" }, encodedGrade: { midterm: "5.00", final: "5.00" } },
+            "2023101018": { name: "TORRES, Dane Eliz Pardillo", midterm: { "S2": "10/10", "R1": "10/10", "Q1": "14/40", "Q2": "24/48", "TERM EXAM": "37/60" }, final: { "S1": "16/18", "Q1": "18/40", "Q2": "25/50", "TERM EXAM": "31/60" }, rawGrade: { midterm: "2.6175", final: "2.7767", average: "2.6971" }, encodedGrade: { midterm: "2.50", final: "2.75" } },
+            "2024802502": { name: "VALDEZ, Jhana Marie Pama", midterm: { "S2": "5/10", "R1": "10/10", "Q1": "21/40", "Q2": "29/48", "TERM EXAM": "27/60" }, final: { "S1": "17/18", "Q1": "21/40", "Q2": "28/50", "TERM EXAM": "39/60" }, rawGrade: { midterm: "2.8277", final: "2.3953", average: "2.6115" }, encodedGrade: { midterm: "2.75", final: "2.50" } },
+            "2024801233": { name: "VICENTE, Jhon Lester Bandonil", midterm: { "S2": "4/10", "R1": "8/10", "Q1": "11/40", "Q2": "20/48", "TERM EXAM": "20/60" }, final: { "S1": "17/18", "Q1": "20/40", "Q2": "23/50", "TERM EXAM": "23/60" }, rawGrade: { midterm: "3.4867", final: "2.9753", average: "3.2310" }, encodedGrade: { midterm: "5.00", final: "5.00" } }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const studentNoInput = document.getElementById('studentNo');
+            const searchBtn = document.getElementById('searchBtn');
+            const gradeResults = document.getElementById('gradeResults');
+            const backBtn = document.getElementById('backBtn');
+            const errorMsg = document.getElementById('errorMsg');
+
+            const handleSearch = () => {
+                const id = studentNoInput.value.trim();
+                errorMsg.style.display = 'none';
+
+                if (!id) {
+                    showError('Please enter a student number.');
+                    return;
+                }
+
+                if (studentData[id]) {
+                    displayGrades(id, studentData[id]);
+                } else {
+                    showError('Student number not found. Please try again.');
+                }
+            };
+
+            const showError = (msg) => {
+                errorMsg.querySelector('span').textContent = msg;
+                errorMsg.style.display = 'block';
+            };
+
+            const displayGrades = (id, data) => {
+                document.getElementById('studentName').textContent = data.name;
+                document.getElementById('studentNumber').textContent = id;
+
+                // Midterm Body
+                const mtBody = Object.entries(data.midterm).map(([k, v]) => `
+                    <tr>
+                        <td class="component-name">${k}</td>
+                        <td class="component-score">${v.split('/')[0]} <span class="component-total">/${v.split('/')[1]}</span></td>
+                    </tr>
+                `).join('');
+                document.getElementById('midtermBody').innerHTML = mtBody;
+
+                // Final Body
+                const fBody = Object.entries(data.final).map(([k, v]) => `
+                    <tr>
+                        <td class="component-name">${k}</td>
+                        <td class="component-score">${v.split('/')[0]} <span class="component-total">/${v.split('/')[1]}</span></td>
+                    </tr>
+                `).join('');
+                document.getElementById('finalBody').innerHTML = fBody;
+
+                // Summary Stats
+                document.getElementById('rawMidterm').textContent = data.rawGrade.midterm;
+                document.getElementById('rawFinal').textContent = data.rawGrade.final;
+                document.getElementById('rawAverage').textContent = data.rawGrade.average;
+                document.getElementById('encodedMidterm').textContent = data.encodedGrade.midterm;
+                document.getElementById('encodedFinal').textContent = data.encodedGrade.final;
+
+                gradeResults.style.display = 'block';
+                gradeResults.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            };
+
+            searchBtn.addEventListener('click', handleSearch);
+            studentNoInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSearch(); });
+            backBtn.addEventListener('click', () => {
+                gradeResults.style.display = 'none';
+                studentNoInput.value = '';
+                studentNoInput.focus();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html>
